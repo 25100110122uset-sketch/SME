@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: lab(63.03% -51.88 26.56);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px #00000015;
+        }
+
+        h1 {
+            text-align: center;
+            color: #c81d1d;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        input, select, button {
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+        }
+
+        input {
+            flex: 1;
+            min-width: 0;
+        }
+
+        button {
+            background: #2563eb;
+            color: rgb(255, 255, 255);
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .reset {
+            background: #475569;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #dbeafe;
+        }
+
+        #message {
+            color: #dc2626;
+            margin-top: 15px;
+        }
+
+        #count {
+            color: #475569;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .search-box {
+                flex-wrap: wrap;
+            }
+
+            .search-box input,
+            .search-box select {
+                width: 100%;
+                flex: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Employee Management System</h1>
+
+    <h3>Search Employee by ID</h3>
+
+    <div class="search-box">
+        <input
+            type="text"
+            id="employeeId"
+            placeholder="Enter Employee ID (e.g. EMP101)"
+        >
+
+        <button onclick="searchEmployee()">Search</button>
+
+        <button class="reset" onclick="showAllEmployees()">
+            Show All
+        </button>
+    </div>
+    <button onclick="showAddForm()">+ Add Employee</button>
+
+<div id="addEmployeeForm" style="display:none; margin-top:20px;">
+    <h3>Add New Employee</h3>
+
+    <input type="text" id="newId" placeholder="Employee ID (EMP109)">
+    <br><br>
+
+    <input type="text" id="newName" placeholder="Employee Name">
+    <br><br>
+
+    <select id="newDept">
+        <option value="">Select Department</option>
+        <option value="IT">IT</option>
+        <option value="HR">HR</option>
+        <option value="Finance">Finance</option>
+        <option value="Marketing">Marketing</option>
+        <option value="Sales">Sales</option>
+    </select>
+    <br><br>
+
+    <input type="text" id="newDesignation" placeholder="Designation">
+    <br><br>
+
+    <input type="number" id="newSalary" placeholder="Salary">
+    <br><br>
+
+    <button onclick="addEmployee()">Save Employee</button>
+    <button onclick="hideAddForm()">Cancel</button>
+
+    <p id="addMessage"></p>
+</div>
+
+    <h3>Filter by Department</h3>
+
+    <select id="department" onchange="filterDepartment()">
+        <option value="All">All Departments</option>
+        <option value="IT">IT</option>
+        <option value="HR">HR</option>
+        <option value="Finance">Finance</option>
+        <option value="Marketing">Marketing</option>
+        <option value="Sales">Sales</option>
+    </select>
+
+    <p id="count"></p>
+    <p id="message"></p>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Designation</th>
+                    <th>Salary</th>
+                </tr>
+            </thead>
+
+            <tbody id="employeeTable"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+
+    const employees = [
+        {
+            id: "EMP101",
+            name: "arsalan",
+            dept: "IT",
+            designation: "Web Developer",
+            salary: 45000
+        },
+        {
+            id: "EMP102",
+            name: "samii",
+            dept: "HR",
+            designation: "HR Manager",
+            salary: 50000
+        },
+        {
+            id: "EMP103",
+            name: "haroon rashid",
+            dept: "Finance",
+            designation: "Accountant",
+            salary: 40000
+        },
+        {
+            id: "EMP104",
+            name: "Gupta",
+            dept: "Marketing",
+            designation: "Marketing Executive",
+            salary: 35000
+        },
+        {
+            id: "EMP105",
+            name: "bashir ah khan",
+            dept: "Sales",
+            designation: "Sales Executive",
+            salary: 32000
+        },
+        {
+            id: "EMP106",
+            name: "adeer",
+            dept: "IT",
+            designation: "Software Engineer",
+            salary: 55000
+        },
+        {
+            id: "EMP107",
+            name: "Kabir Ahmed",
+            dept: "HR",
+            designation: "Recruiter",
+            salary: 30000
+        },
+        {
+            id: "EMP108",
+            name: "Ananya Das",
+            dept: "Finance",
+            designation: "Financial Analyst",
+            salary: 48000
+        }
+    ];
+    function displayEmployees(list) {
+        const table = document.getElementById("employeeTable");
+        const count = document.getElementById("count");
+        const message = document.getElementById("message");
+
+        table.innerHTML = "";
+        message.textContent = "";
+        count.textContent = "Total Employees Found: " + list.length;
+
+        if (list.length === 0) {
+            message.textContent = "No employee found!";
+            return;
+        }
+
+        list.forEach(function(emp) {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${emp.id}</td>
+                <td>${emp.name}</td>
+                <td>${emp.dept}</td>
+                <td>${emp.designation}</td>
+                <td>₹${emp.salary.toLocaleString("en-IN")}</td>
+            `;
+
+            table.appendChild(row);
+        });
+    }
+    function searchEmployee() {
+        const id = document
+            .getElementById("employeeId")
+            .value.trim().toUpperCase();
+
+        if (id === "") {
+            document.getElementById("message").textContent =
+                "Please enter an Employee ID!";
+            displayEmployees([]);
+            return;
+        }
+
+        const result = employees.filter(function(emp) {
+            return emp.id === id;
+        });
+
+        document.getElementById("department").value = "All";
+        displayEmployees(result);
+    }
+    function filterDepartment() {
+        const dept = document.getElementById("department").value;
+
+        document.getElementById("employeeId").value = "";
+
+        if (dept === "All") {
+            displayEmployees(employees);
+        } else {
+            const result = employees.filter(function(emp) {
+                return emp.dept === dept;
+            });
+
+            displayEmployees(result);
+        }
+    }
+    function showAllEmployees() {
+        document.getElementById("employeeId").value = "";
+        document.getElementById("department").value = "All";
+
+        displayEmployees(employees);
+        
+    }
+    function showAddForm() {
+    document.getElementById("addEmployeeForm").style.display = "block";
+}
+
+function hideAddForm() {
+    document.getElementById("addEmployeeForm").style.display = "none";
+}
+
+function addEmployee() {
+    const id = document.getElementById("newId")
+        .value.trim().toUpperCase();
+    const name = document.getElementById("newName").value.trim();
+    const dept = document.getElementById("newDept").value;
+    const designation = document.getElementById("newDesignation").value.trim();
+    const salaryText = document.getElementById("newSalary").value;
+    const salary = Number(salaryText);
+
+    const message = document.getElementById("addMessage");
+
+    if (!id || !name || !dept || !designation || salaryText === "") {
+        message.textContent = "Please fill all fields!";
+        return;
+    }
+
+    if (!Number.isFinite(salary) || salary < 0) {
+        message.textContent = "Enter a valid salary!";
+        return;
+    }
+
+    const exists = employees.some(function(emp) {
+        return emp.id.toUpperCase() === id;
+    });
+
+    if (exists) {
+        message.textContent = "Employee ID already exists!";
+        return;
+    }
+
+    employees.push({
+        id: id,
+        name: name,
+        dept: dept,
+        designation: designation,
+        salary: salary
+    });
+
+    document.getElementById("employeeId").value = "";
+    document.getElementById("employeeName").value = "";
+    document.getElementById("department").value = "All";
+
+    displayEmployees(employees);
+
+    message.textContent = "Employee added successfully!";
+}
+
+displayEmployees(employees);
+</script>
+
+
+</script>
+
+</body>
+</html>
